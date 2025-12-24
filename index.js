@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { connectDB } from "./config/db.js"; // Config folder
+import authenticate from "./middleware/auth.js"
 
 dotenv.config();
 
@@ -34,6 +35,22 @@ app.get("/", (req, res) => {
   res.status(200).send("Trainer Booking Backend is running 🚀");
 });
 
+app.get("/api/test-firebase", async (req, res) => {
+  try {
+    // Just a test message
+    res.status(200).json({
+      success: true,
+      message: "Firebase Admin is working! 🚀"
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong"
+    });
+  }
+});
+
 // Modular routes
 // app.use("/api/auth", authRoutes);
 // app.use("/api/users", userRoutes);
@@ -60,5 +77,13 @@ const startServer = async () => {
     process.exit(1);
   }
 };
+
+app.get("/api/protected", authenticate, (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "You have accessed a protected route!",
+    user: req.user
+  });
+});
 
 startServer();
